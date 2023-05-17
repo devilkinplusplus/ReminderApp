@@ -11,11 +11,9 @@ namespace ReminderApp.Concretes
 {
     public class Operations : IOperations
     {
-        private readonly AppDbContext _context;
         private readonly ITodoService _todoService;
-        public Operations(AppDbContext context, ITodoService todoService)
+        public Operations(ITodoService todoService)
         {
-            _context = context;
             _todoService = todoService;
         }
 
@@ -28,49 +26,42 @@ namespace ReminderApp.Concretes
 
             switch (method)
             {
-                case MethodType.telegram:
+                case MethodType.Telegram:
                     BackgroundJob.Schedule<TelegramService>(x => x.SendMessageAsync(to, content), delay);
                     break;
-                case MethodType.email:
+                case MethodType.Email:
                     BackgroundJob.Schedule<MailService>(x => x.SendMessageAsync(to, content), delay);
                     break;
                 default:
                     throw new Exception("No method found");
             }
         }
-
-
-        public async Task UpdateMessageAsync(int id, string to, string content, DateTime sendAt, MethodType method)
-        {
-            var delay = sendAt - DateTime.UtcNow;
-
-            if (!IsValidDateTime(sendAt))
-                throw new Exception("Invalid send time");
-
-            switch (method)
-            {
-                case MethodType.telegram:
-                    BackgroundJob.Schedule<TelegramService>(x => x.UpdateMessageAsync(id,to,content), delay);
-                    break;
-                case MethodType.email:
-                    BackgroundJob.Schedule<MailService>(x => x.SendMessageAsync(to, content), delay);
-                    break;
-                default:
-                    throw new Exception("No method found");
-            }
-        }
-
-        public async Task<IEnumerable<Todo>> GetAllTodosAsync() => await _context.Todos.ToListAsync();
+        public async Task<IEnumerable<Todo>> GetAllTodosAsync() => await _todoService.GetAllAsync();
         public async Task DeleteAsync(int id)
         {
-            Todo? entity = await _context.Todos.FindAsync(id);
+            Todo? entity = await _todoService.GetAsync(id);
             await _todoService.DeleteAsync(entity);
+        }
+        public async Task UpdateMessageAsync(int id, string to, string content, DateTime sendAt, MethodType method)
+        {
+            try
+            {
+                Todo todo = await _todoService.GetAsync(id);
+                todo.To = to ?? todo.To;
+                todo.Content = content ?? todo.Content;
+                todo.SendAt = sendAt;
+                todo.Method = method.ToString() ?? todo.Method;
+                await _todoService.UpdateAsync(todo);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
         private bool IsValidDateTime(DateTime sendAt)
         {
             DateTime currentDateTime = DateTime.UtcNow;
             return sendAt > currentDateTime;
         }
-
     }
 }

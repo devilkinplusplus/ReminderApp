@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ReminderApp.Abstractions;
 using ReminderApp.Concretes;
 using ReminderApp.Context;
-using System.Collections.Generic;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,9 @@ builder.Services.AddScoped<IOperations,Operations>();
 
 builder.Services.AddHangfire(x =>
 {
+    x.SetDataCompatibilityLevel(CompatibilityLevel.Version_170);
+    x.UseSimpleAssemblyNameTypeSerializer();
+    x.UseRecommendedSerializerSettings();
     x.UseSqlServerStorage(builder.Configuration.GetConnectionString("HangfireServer"));
 });
 builder.Services.AddHangfireServer();

@@ -23,22 +23,21 @@ namespace ReminderApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]CreateMessageParams param)
+        public async Task<IActionResult> Create([FromBody] CreateMessageParams param)
         {
-            _operations.SendMessageAtTime(param.To, param.Content, param.SendAt, (MethodType)Enum.Parse(typeof(MethodType),param.Method));
+            _operations.SendMessageAtTime(param.To, param.Content, param.SendAt, (MethodType)Enum.Parse(typeof(MethodType), param.Method));
             return Ok();
         }
 
         [HttpGet]
-        public async Task<IActionResult> Read()
-        {
-            return Ok(await _operations.GetAllTodosAsync());
-        }
+        public async Task<IActionResult> Read() => Ok(await _operations.GetAllTodosAsync());
+        
 
         [HttpPut]
-        public async Task<IActionResult> Put([FromBody]UpdateMessageParams param)
+        public async Task<IActionResult> Update([FromBody] UpdateMessageParams param)
         {
-            await _operations.UpdateMessageAsync(param.Id,param.To,param.Content,param.SendAt, (MethodType)Enum.Parse(typeof(MethodType), param.Method));
+            await _operations.UpdateMessageAsync(param.Id, param.To, param.Content, param.SendAt, 
+                                                (MethodType)Enum.Parse(typeof(MethodType), param.Method));
             return NoContent();
         }
 

@@ -1,12 +1,8 @@
 ﻿using ReminderApp.Abstractions;
+using ReminderApp.Enums;
 using System.Net.Mail;
 using System.Net;
 using System.Text;
-using ReminderApp.Enums;
-using ReminderApp.RequestParameters;
-using ReminderApp.Context;
-using Microsoft.EntityFrameworkCore;
-using ReminderApp.Entities;
 using Telegram.Bot.Types;
 
 namespace ReminderApp.Concretes
@@ -43,14 +39,8 @@ namespace ReminderApp.Concretes
                 To = to,
                 Content = content,
                 SendAt = DateTime.Now,
-                Method = MethodType.email.ToString(),
+                Method = MethodType.Email.ToString(),
             });
-        }
-
-        //Just stupid VS error
-        Task<Message> IMessageService.SendMessageAsync(string to, string content)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -2,7 +2,7 @@
 {
     public enum MethodType
     {
-        telegram,
-        email
+        Telegram,
+        Email
     }
 }

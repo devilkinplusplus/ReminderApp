@@ -5,6 +5,6 @@ namespace ReminderApp.Abstractions
 {
     public interface IMessageService
     {
-        Task<Message> SendMessageAsync(string to, string content);
+        Task SendMessageAsync(string to, string content);
     }
 }

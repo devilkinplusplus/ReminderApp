@@ -18,23 +18,19 @@ namespace ReminderApp.Concretes
             _todoService = todoService;
         }
 
-        public async Task<Message> SendMessageAsync(string to, string content)
+        public async Task SendMessageAsync(string to, string content)
         {
+            var botClient = new TelegramBotClient(TelegramApiInformations.ApiKey);
+            await botClient.SendTextMessageAsync(to, content);
             await _todoService.AddAsync(new()
             {
                 To = to,
                 Content = content,
                 SendAt = DateTime.Now,
-                Method = MethodType.telegram.ToString(),
+                Method = MethodType.Telegram.ToString(),
             });
-            var botClient = new TelegramBotClient(TelegramApiInformations.ApiKey);
-            return await botClient.SendTextMessageAsync(to, content);
         }
 
-        public async Task UpdateMessageAsync(int messageId, string to, string content)
-        {
-            var botClient = new TelegramBotClient(TelegramApiInformations.ApiKey);
-            await botClient.EditMessageTextAsync(to,messageId,content);
-        }
+    
     }
 }
